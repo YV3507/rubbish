@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - firefly_data:/data
+      - ./backend:/app
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///data/firefly.db
+      - COMPUTE_NODE_URL=http://compute:8080
+      - LOG_LEVEL=INFO
+    depends_on:
+      - compute
+    restart: unless-stopped
+
+  compute:
+    build:
+      context: ./compute-node
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - compute_data:/data
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  firefly_data:
+  compute_data:
