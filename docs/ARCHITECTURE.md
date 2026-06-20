@@ -4,14 +4,14 @@
 
 ```mermaid
 graph LR
-    subgraph "Docker Compose"
-        BE["Backend:8000<br/>Python/FastAPI"]
-        CN["Compute:8080<br/>Rust/Axum"]
-        FE["Frontend:3000<br/>React/Vite"]
+    subgraph "Docker Compose (rubbish-net)"
+        BE["Backend:8000<br/>Python/FastAPI<br/>health: GET /health"]
+        CN["Compute:8080<br/>Rust/Axum<br/>health: GET /health"]
+        FE["Frontend:80 → :3000<br/>nginx (static + proxy)<br/>depends: backend healthy"]
     end
 
-    USER["Browser"] -->|HTTP + SSE + WS| FE
-    FE -->|"/api/*" proxy| BE
+    USER["Browser"] -->|":3000" HTTP + SSE + WS| FE
+    FE -->|"/api/*" proxy_pass| BE
     BE -->|"/graph/* /compress/*"| CN
     BE -->|"aiosqlite"| SQLITE[("SQLite<br/>sessions.db")]
     CN -->|"rusqlite + FTS5"| DB[("SQLite<br/>codegraph.db")]
@@ -20,6 +20,10 @@ graph LR
     style CN fill:#DEA584,color:#fff
     style FE fill:#61DAFB,color:#000
 ```
+
+All three services run inside a dedicated bridge network (`rubbish-net`) and communicate
+via Docker service names. The frontend uses nginx to proxy `/api/*` requests to the backend
+and provides SPA fallback (all non-API routes serve `index.html`).
 
 ## End-to-End Data Flow
 

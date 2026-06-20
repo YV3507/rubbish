@@ -1,43 +1,83 @@
+# =============================================================================
+# Rubbish — Docker Compose (Development & Production)
+# =============================================================================
+# Usage:
+#   docker-compose up --build              # foreground
+#   docker-compose up --build -d           # detached
+#   docker-compose down                    # stop & remove containers
+#   docker-compose down -v                 # also remove named volumes
+#
+# Environment variables are loaded from `.env` in this directory.
+# Copy .env.docker to .env and configure before starting:
+#   cp .env.docker .env
+# =============================================================================
+
 version: "3.9"
+
+x-common: &common
+  restart: unless-stopped
+  networks:
+    - rubbish-net
 
 services:
   backend:
+    <<: *common
     build:
       context: ./backend
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "${BACKEND_PORT:-8000}:8000"
     volumes:
-      - firefly_data:/data
-      - ./backend:/app
+      - backend_data:/data
+    env_file:
+      - .env
     environment:
-      - DATABASE_URL=sqlite+aiosqlite:///data/firefly.db
+      # Override compute URL to use Docker service name
       - COMPUTE_NODE_URL=http://compute:8080
-      - LOG_LEVEL=INFO
     depends_on:
-      - compute
-    restart: unless-stopped
+      compute:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; print(urllib.request.urlopen('http://localhost:8000/health').read())"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
 
   compute:
+    <<: *common
     build:
       context: ./compute-node
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "${COMPUTE_PORT:-8080}:8080"
     volumes:
       - compute_data:/data
-    restart: unless-stopped
+    environment:
+      - COMPUTE_DB_PATH=/data/codegraph.db
+      - COMPUTE_PORT=8080
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
 
   frontend:
+    <<: *common
     build:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "3000:80"
+      - "${FRONTEND_PORT:-3000}:80"
     depends_on:
-      - backend
-    restart: unless-stopped
+      backend:
+        condition: service_healthy
 
 volumes:
-  firefly_data:
+  backend_data:
   compute_data:
+
+networks:
+  rubbish-net:
+    driver: bridge

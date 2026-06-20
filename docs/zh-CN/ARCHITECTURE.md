@@ -4,13 +4,13 @@
 
 ```mermaid
 graph LR
-    subgraph "Docker Compose"
-        BE["Backend:8000<br/>Python/FastAPI"]
-        CN["Compute:8080<br/>Rust/Axum"]
-        FE["Frontend:3000<br/>React/Vite"]
+    subgraph "Docker Compose (rubbish-net)"
+        BE["Backend:8000<br/>Python/FastAPI<br/>健康检查: GET /health"]
+        CN["Compute:8080<br/>Rust/Axum<br/>健康检查: GET /health"]
+        FE["Frontend:80 → :3000<br/>nginx（静态文件 + 代理）<br/>依赖: backend 健康"]
     end
 
-    USER["浏览器"] -->|HTTP + SSE + WS| FE
+    USER["浏览器"] -->|":3000" HTTP + SSE + WS| FE
     FE -->|"/api/*" 代理| BE
     BE -->|"/graph/* /compress/*"| CN
     BE -->|"aiosqlite"| SQLITE[("SQLite<br/>sessions.db")]
@@ -20,6 +20,8 @@ graph LR
     style CN fill:#DEA584,color:#fff
     style FE fill:#61DAFB,color:#000
 ```
+
+三个服务运行在专用的桥接网络（`rubbish-net`）中，通过 Docker 服务名通信。前端使用 nginx 将 `/api/*` 请求代理到后端，并提供 SPA 回退（所有非 API 路由服务 `index.html`）。
 
 ## 端到端数据流
 

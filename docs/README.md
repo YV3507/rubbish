@@ -8,18 +8,19 @@ Rubbish is a full-stack, multi-process agent platform that combines LLM orchestr
 
 ## Quick Start
 
-```bash
-# Option A: Full stack via Docker
-docker compose up -d
-open http://localhost:3000
+### Docker (recommended)
 
-# Option B: Individual services (development)
-.\run.ps1 backend       # FastAPI on :8000
-.\run.ps1 frontend      # Vite on :5173
-.\run.ps1 compute       # Rust on :8080
-.\run.ps1 all           # backend + compute + frontend in background
-.\run.ps1 all -Dev      # same, but in separate terminal windows
-.\run.ps1 stop          # gracefully stop all background services
+```bash
+cp .env.docker .env        # configure LLM_API_KEY
+docker compose up --build -d
+open http://localhost:3000
+```
+
+### Local development (Windows)
+
+```powershell
+.\run.ps1 all -Install     # start all 3 services in background
+.\run.ps1 stop             # gracefully stop all services
 ```
 
 ## Architecture Overview
@@ -71,6 +72,16 @@ graph TB
     HR --> FS
 ```
 
+## Documentation
+
+| Guide | English | 中文 |
+| :--- | :--- | :--- |
+| Architecture | [ARCHITECTURE.md](ARCHITECTURE.md) | [zh-CN/ARCHITECTURE.md](zh-CN/ARCHITECTURE.md) |
+| API Reference | [API.md](API.md) | [zh-CN/API.md](zh-CN/API.md) |
+| Configuration | [CONFIG.md](CONFIG.md) | [zh-CN/CONFIG.md](zh-CN/CONFIG.md) |
+| Deployment | [DEPLOYMENT.md](DEPLOYMENT.md) | [zh-CN/DEPLOYMENT.md](zh-CN/DEPLOYMENT.md) |
+| Development | [DEVELOPMENT.md](DEVELOPMENT.md) | [zh-CN/DEVELOPMENT.md](zh-CN/DEVELOPMENT.md) |
+
 ## Project Structure
 
 ```
@@ -88,10 +99,13 @@ rubbish/
 │   │   ├── config/       # ConfigSchema (centralized)
 │   │   ├── api/          # REST routes + WebSocket
 │   │   └── skills/       # Skill loader
-│   └── tests/            # 76+ pytest tests
+│   └── tests/            # 105+ pytest tests
 ├── compute-node/         # Rust Axum — code analysis & compression
 ├── frontend/             # React + Vite — WebUI
 ├── docs/                 # Documentation
+│   └── zh-CN/            # Chinese documentation
+├── .env.docker           # Docker environment template
+├── docker-compose.yml    # Docker Compose configuration
 ├── run.ps1               # Unified run entry point
 └── runtests.ps1          # Unified test runner
 ```
@@ -100,7 +114,7 @@ rubbish/
 
 | Script | Purpose | Examples |
 | :--- | :--- | :--- |
-| [`run.ps1`](../run.ps1) | Start/stop services | `.\run.ps1 backend`, `.\run.ps1 all -Install`, `.\run.ps1 stop` |
+| [`run.ps1`](../run.ps1) | Start/stop services | `.\run.ps1 backend`, `.\run.ps1 all`, `.\run.ps1 stop` |
 | [`runtests.ps1`](../runtests.ps1) | Run all/module tests | `.\runtests.ps1`, `.\runtests.ps1 -Module backend` |
 
 ## License

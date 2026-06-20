@@ -25,8 +25,11 @@
 
 ```bash
 # Full stack via Docker
-docker compose up -d
+cp .env.docker .env        # configure LLM_API_KEY
+docker compose up --build -d
+open http://localhost:3000
 
 # Or individual services (Windows)
 .\run.ps1 all
+.\run.ps1 stop
 ```
