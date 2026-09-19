@@ -1,0 +1,93 @@
+name: Bug report
+description: Report a reproducible problem with Rubbish
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report. Please fill in as much
+        detail as you can — it makes the issue far easier to reproduce and fix.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight checklist
+      options:
+        - label: I searched existing issues and this is not a duplicate.
+          required: true
+        - label: I am running the latest code from `main`.
+          required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected component
+      description: Which part of the stack is involved?
+      options:
+        - backend (Python / FastAPI)
+        - compute-node (Rust / Axum)
+        - frontend (React / Vite)
+        - docs
+        - docker / deployment
+        - not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear and concise description of the actual behaviour.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Configure `.env` with ...
+        2. Run `.\run.ps1 all`
+        3. Send the prompt ...
+        4. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or error output
+      description: Paste logs from `logs/` or the browser console. Redact any API keys.
+      render: shell
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      description: Output of `git rev-parse --short HEAD`, or the release tag.
+    validations:
+      required: false
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      value: |
+        - OS:
+        - Python:
+        - Rust (cargo --version):
+        - Node.js:
+        - Deployment: (docker compose / run.ps1)
+        - LLM provider and model:
+    validations:
+      required: true

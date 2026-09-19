@@ -1,0 +1,62 @@
+name: Feature request
+description: Suggest an idea or improvement for Rubbish
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve Rubbish. Please describe the problem first,
+        then your proposed solution.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight checklist
+      options:
+        - label: I searched existing issues and this is not a duplicate.
+          required: true
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Relevant component
+      options:
+        - backend (Python / FastAPI)
+        - compute-node (Rust / Axum)
+        - frontend (React / Vite)
+        - docs
+        - docker / deployment
+        - not sure
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the limitation or pain point you are hitting.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Mockups, links, or references that help explain the request.
+    validations:
+      required: false

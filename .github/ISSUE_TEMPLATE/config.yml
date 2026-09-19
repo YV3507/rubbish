@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://github.com/YV3507/rubbish/tree/main/docs
+    about: Architecture, API, configuration and deployment guides (English and 中文).
+  - name: Questions and ideas
+    url: https://github.com/YV3507/rubbish/discussions
+    about: Ask questions or discuss ideas with the community.
